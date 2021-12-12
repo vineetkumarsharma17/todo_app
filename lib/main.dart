@@ -1,6 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:todo_app/time_model.dart';
 import 'package:todo_app/todo_model.dart';
+import 'package:intl/intl.dart';
 void main(){
   runApp(MyApp());
 }
@@ -17,16 +21,21 @@ class MyApp extends StatelessWidget {
       ),
       home: ChangeNotifierProvider(
         create: (context)=>TodoModel(),
-        child: const MyHomePage(),
+        child:  MyHomePage(),
       ),
     );
   }
 }
 class MyHomePage extends StatelessWidget {
-  const MyHomePage({Key? key}) : super(key: key);
+  String? formattedDateTime="hh";
 
+  MyHomePage({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
+    Timer.periodic(const Duration(seconds: 1), (Timer t){
+     var time= Provider.of<TodoModel>(context,listen: false);
+      time.updateRemainingTime();
+    });
     return Scaffold(
       backgroundColor: Colors.lightBlue[900],
       appBar: AppBar(
@@ -39,20 +48,22 @@ class MyHomePage extends StatelessWidget {
       body:  Column(
         children: <Widget>[
       Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-        children: const <Widget>[
-          SizedBox(height: 20,),
-          Text("02 : 36 PM",
-            style: TextStyle(
-                color: Colors.white70,
-                fontSize: 45,
-                fontWeight: FontWeight.bold
-            ),),
-          Text("current time",
+      crossAxisAlignment: CrossAxisAlignment.center,
+        children:  <Widget>[
+          const SizedBox(height: 20,),
+          Consumer<TodoModel>(builder: (context,time,child){
+            return Text(time.getTime().toString(),
+              style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 45,
+                  fontWeight: FontWeight.bold
+              ),);
+          }),
+          const Text("current time",
             style: TextStyle(
               color: Colors.white,
               fontSize: 16,),),
-          SizedBox(height: 20,),
+          const SizedBox(height: 20,),
         ],
       ),
           Expanded(child: Container(
